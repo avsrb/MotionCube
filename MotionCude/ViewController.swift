@@ -39,7 +39,6 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        square.addGestureRecognizer(tapGesture)
         view.backgroundColor = .orange
         
         square.backgroundColor = .red
@@ -56,8 +55,12 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
 //        for view in views {
 //            let tapGesture = UIGestureRecognizer()
 //            tapGesture.addTarget(self, action: #selector(handleTap))
-
-            tapGesture.delegate = self
+        //TODO: исправть баг
+        tapGesture.delegate = self
+        panGesture.delegate = self
+        pinchGesture.delegate = self
+        rotateGesture.delegate = self
+        
 //            view.addGestureRecognizer(tapGesture)
 //        }
         tapGesture.require(toFail: tapGesture)
@@ -69,6 +72,8 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
     }
     
+    var panGestureAnchorPoint: CGPoint?
+    
     @objc
     private func handlePan(_ gesture: UIPanGestureRecognizer) {
         let translation = gesture.translation(in: square)
@@ -77,11 +82,25 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
             return
         }
         
-        gestureView.center = CGPoint(
-            x: gestureView.center.x + translation.x,
-            y: gestureView.center.y + translation.y
-        )
-        gesture.setTranslation(.zero, in: square)
+        switch gesture.state {
+        case .began:
+//            assert(panGestureAnchorPoint == nil)
+//            panGestureAnchorPoint = gesture.location(in: view)
+            print()
+            
+        case .changed:
+            gestureView.center = CGPoint(
+                x: gestureView.center.x + translation.x,
+                y: gestureView.center.y + translation.y
+            )
+            gesture.setTranslation(.zero, in: square)
+                        
+        case .ended, .cancelled, .failed:
+            print(".ended, .cancelled, .failed:")
+        default:
+            break
+        }
+        
         //анимация
         /*
         guard gesture.state == .began else {
@@ -118,7 +137,7 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
             return
         }
         
-        gestureView.transform.scaledBy(
+        gestureView.transform = gestureView.transform.scaledBy(
             x: gesture.scale,
             y: gesture.scale
         )
