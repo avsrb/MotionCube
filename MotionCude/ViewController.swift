@@ -48,21 +48,12 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         square.addGestureRecognizer(pinchGesture)
         square.addGestureRecognizer(rotateGesture)
 
-//        let views = view.subviews.filter {
-//            $0 is UIView
-//        }
-//
-//        for view in views {
-//            let tapGesture = UIGestureRecognizer()
-//            tapGesture.addTarget(self, action: #selector(handleTap))
         //TODO: исправть баг
         tapGesture.delegate = self
         panGesture.delegate = self
         pinchGesture.delegate = self
         rotateGesture.delegate = self
         
-//            view.addGestureRecognizer(tapGesture)
-//        }
         tapGesture.require(toFail: tapGesture)
         
     }
@@ -152,9 +143,20 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         
         gestureView.transform = gestureView.transform.rotated(by: gesture.rotation)
         gesture.rotation = 0
+//        var original = CGFloat()
+//        var last: CGFloat = 0
+//
+//        if gesture.state == .began {
+//            gesture.rotation = last
+//            original = gesture.rotation
+//        } else if gesture.state == .changed {
+//            let new = gesture.rotation + original
+//            gesture.view?.transform = CGAffineTransform(rotationAngle: new)
+//        } else if gesture.state == .ended {
+//            last = gesture.rotation
+//        }
     }
  
-    
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         true
     }
