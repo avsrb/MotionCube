@@ -13,6 +13,8 @@
 		AC599B2F28AF615800EE605E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC599B2E28AF615800EE605E /* Assets.xcassets */; };
 		AC599B3228AF615800EE605E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AC599B3028AF615800EE605E /* LaunchScreen.storyboard */; };
 		AC599B3A28AF628700EE605E /* MotionCubeAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC599B3928AF628600EE605E /* MotionCubeAssembly.swift */; };
+		AC599B3C28AFECDF00EE605E /* Extention+UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC599B3B28AFECDF00EE605E /* Extention+UIColor.swift */; };
+		AC599B3E28AFF55B00EE605E /* ShaveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC599B3D28AFF55B00EE605E /* ShaveView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		AC599B3128AF615800EE605E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AC599B3328AF615800EE605E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC599B3928AF628600EE605E /* MotionCubeAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionCubeAssembly.swift; sourceTree = "<group>"; };
+		AC599B3B28AFECDF00EE605E /* Extention+UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extention+UIColor.swift"; sourceTree = "<group>"; };
+		AC599B3D28AFF55B00EE605E /* ShaveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaveView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +67,8 @@
 				AC599B2E28AF615800EE605E /* Assets.xcassets */,
 				AC599B3028AF615800EE605E /* LaunchScreen.storyboard */,
 				AC599B3328AF615800EE605E /* Info.plist */,
+				AC599B3B28AFECDF00EE605E /* Extention+UIColor.swift */,
+				AC599B3D28AFF55B00EE605E /* ShaveView.swift */,
 			);
 			path = MotionCude;
 			sourceTree = "<group>";
@@ -138,8 +144,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC599B3A28AF628700EE605E /* MotionCubeAssembly.swift in Sources */,
+				AC599B3C28AFECDF00EE605E /* Extention+UIColor.swift in Sources */,
 				AC599B2A28AF614B00EE605E /* ViewController.swift in Sources */,
 				AC599B2628AF614B00EE605E /* AppDelegate.swift in Sources */,
+				AC599B3E28AFF55B00EE605E /* ShaveView.swift in Sources */,
 				AC599B2828AF614B00EE605E /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

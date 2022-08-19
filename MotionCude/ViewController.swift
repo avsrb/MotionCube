@@ -6,13 +6,12 @@
 //
 
 import UIKit
+import CoreMotion
 
 final class ViewController: UIViewController, UIGestureRecognizerDelegate {
 
     private lazy var initialSize = CGSize(width: 100, height: 100)
-    
-    private lazy var square = UIView(frame: CGRect(x: 10, y: 10, width: 300, height: 300))
-    
+        
     private lazy var tapGesture: UITapGestureRecognizer = {
         let tapGesture = UITapGestureRecognizer()
         tapGesture.addTarget(self, action: #selector(handleTap))
@@ -37,16 +36,23 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         return rotationGesture
     }()
     
+    var newShape = ShapeView()
+
+    private lazy var animator = UIDynamicAnimator(referenceView: view)
+    
+    private lazy var gravity = UIGravityBehavior(items: [])
+    private lazy var collision = UICollisionBehavior(items: [])
+    private lazy var elasticity = UIDynamicItemBehavior(items: [])
+    private lazy var motion = CMMotionManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .orange
         
-        square.backgroundColor = .red
-        view.addSubview(square)
-        square.addGestureRecognizer(tapGesture)
-        square.addGestureRecognizer(panGesture)
-        square.addGestureRecognizer(pinchGesture)
-        square.addGestureRecognizer(rotateGesture)
+        view.addGestureRecognizer(tapGesture)
+        view.addGestureRecognizer(panGesture)
+        view.addGestureRecognizer(pinchGesture)
+        view.addGestureRecognizer(rotateGesture)
 
         //TODO: исправть баг
         tapGesture.delegate = self
@@ -54,22 +60,47 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         pinchGesture.delegate = self
         rotateGesture.delegate = self
         
-        tapGesture.require(toFail: tapGesture)
+//        tapGesture.require(toFail: tapGesture)
+        collision.translatesReferenceBoundsIntoBoundary = true
         
+        animator.addBehavior(gravity)
+        animator.addBehavior(collision)
+        animator.addBehavior(elasticity)
+
     }
 
     @objc
     private func handleTap(_ gesture: UITapGestureRecognizer) {
-
+        let location = gesture.location(in: view)
+        
+        guard let gestureView = gesture.view else {
+            return
+        }
+        
+        //это не нужно включать
+//        gestureView.center = CGPoint(
+//            x: location.x + initialSize.width / 2,
+//            y: location.y + initialSize.height / 2
+//        )
+        
+        newShape = ShapeView(frame: .init(origin: location, size: initialSize))
+//        newShape.addGestureRecognizer(<#T##gestureRecognizer: UIGestureRecognizer##UIGestureRecognizer#>)
+        
+        view.addSubview(newShape)
+        
+        gravity.addItem(newShape)
+        collision.addItem(newShape)
+        elasticity.addItem(newShape)
+        
     }
     
     var panGestureAnchorPoint: CGPoint?
     
     @objc
     private func handlePan(_ gesture: UIPanGestureRecognizer) {
-        let translation = gesture.translation(in: square)
+        let translation = gesture.translation(in: view)
         
-        guard let gestureView = gesture.view else {
+        guard let gestureView = gesture.view as? ShapeView else {
             return
         }
         
@@ -84,7 +115,7 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
                 x: gestureView.center.x + translation.x,
                 y: gestureView.center.y + translation.y
             )
-            gesture.setTranslation(.zero, in: square)
+        gesture.setTranslation(.zero, in: view)
                         
         case .ended, .cancelled, .failed:
             print(".ended, .cancelled, .failed:")
@@ -161,4 +192,3 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         true
     }
 }
-
