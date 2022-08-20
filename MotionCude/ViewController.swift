@@ -95,7 +95,6 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
         elasticity.addItem(newShape)
     }
 
-    //done
     @objc
     private func handlePan(_ gesture: UIPanGestureRecognizer) {
         guard let shapeView = gesture.view as? ShapeView else {
