@@ -84,7 +84,6 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
         
         let newShape = ShapeView(frame: .init(origin: center, size: initialSize))
         
-        //гениальная вещь
         [panGesture, pinchGesture, rotateGesture].forEach {
             newShape.addGestureRecognizer($0)
         }
@@ -119,11 +118,7 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
             elasticity.addItem(shapeView)
             animator.updateItem(usingCurrentState: shapeView)
             gesture.setTranslation(.zero, in: view)
-        case .ended:
-            gravity.addItem(shapeView)
-        case .cancelled:
-            gravity.addItem(shapeView)
-        case .failed:
+        case .ended, .cancelled, .failed:
             gravity.addItem(shapeView)
         @unknown default:
             break
@@ -144,20 +139,15 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
         case .changed:
             collision.removeItem(shapeView)
             elasticity.removeItem(shapeView)
-//            gesture.view?.transform = (gesture.view?.transform)!.scaledBy(x: gesture.scale, y: gesture.scale)
             shapeView.transform = shapeView.transform.scaledBy(
                 x: gesture.scale,
                 y: gesture.scale
             )
-            gesture.scale = 0
+            gesture.scale = 1.0
             collision.addItem(shapeView)
             elasticity.addItem(shapeView)
             animator.updateItem(usingCurrentState: shapeView)
-        case .ended:
-            gravity.addItem(shapeView)
-        case .cancelled:
-            gravity.addItem(shapeView)
-        case .failed:
+        case .ended, .cancelled, .failed:
             gravity.addItem(shapeView)
         @unknown default:
             break
@@ -195,8 +185,4 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
             break
         }
     }
-
-//    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-//        true
-//    }
 }
