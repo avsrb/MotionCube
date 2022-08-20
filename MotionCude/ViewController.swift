@@ -8,7 +8,7 @@
 import UIKit
 import CoreMotion
 
-final class ViewController: UIViewController, UIGestureRecognizerDelegate {
+final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICollisionBehaviorDelegate {
 
     private lazy var initialSize = CGSize(width: 100, height: 100)
         
@@ -57,19 +57,26 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         panGesture.delegate = self
         pinchGesture.delegate = self
         rotateGesture.delegate = self
+        collision.collisionDelegate = self
         
 //        tapGesture.require(toFail: tapGesture)
+        elasticity.elasticity = 65/100
         collision.translatesReferenceBoundsIntoBoundary = true
         
         animator.addBehavior(gravity)
         animator.addBehavior(collision)
         animator.addBehavior(elasticity)
+        // почитать про это
+//        motion.startAccelerometerUpdates(to: .main) { <#CMAccelerometerData?#>, <#Error?#> in
+//            <#code#>
+//        }
 
     }
 
     @objc
     private func handleTap(_ gesture: UITapGestureRecognizer) {
         let location = gesture.location(in: view)
+        
         /*
         guard let gestureView = gesture.view else {
             return
@@ -116,8 +123,10 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         case .changed:
             collision.removeItem(shapeView)
             elasticity.removeItem(shapeView)
-            shapeView.center.x += gesture.translation(in: view).x
-            shapeView.center.y += gesture.translation(in: view).y
+            shapeView.center = CGPoint(
+                x: shapeView.center.x + gesture.translation(in: view).x,
+                y: shapeView.center.y + gesture.translation(in: view).y
+            )
             collision.addItem(shapeView)
             elasticity.addItem(shapeView)
             animator.updateItem(usingCurrentState: shapeView)
@@ -189,12 +198,12 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     //done
     @objc
-    private func handlePitch(_ gestureRecognizer: UIPinchGestureRecognizer) {
-        guard let shapeView = gestureRecognizer.view as? ShapeView else {
+    private func handlePitch(_ gesture: UIPinchGestureRecognizer) {
+        guard let shapeView = gesture.view as? ShapeView else {
             return
         }
         
-        switch gestureRecognizer.state {
+        switch gesture.state {
         case .possible:
             break
         case .began:
@@ -202,9 +211,15 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
         case .changed:
             collision.removeItem(shapeView)
             elasticity.removeItem(shapeView)
-            // изменение системы координат
+//            gesture.view?.transform = (gesture.view?.transform)!.scaledBy(x: gesture.scale, y: gesture.scale)
+            shapeView.transform = shapeView.transform.scaledBy(
+                x: gesture.scale,
+                y: gesture.scale
+            )
+            gesture.scale = 1
             collision.addItem(shapeView)
             elasticity.addItem(shapeView)
+            animator.updateItem(usingCurrentState: shapeView)
         case .ended:
             gravity.addItem(shapeView)
         case .cancelled:
@@ -215,37 +230,58 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate {
             break
         }
         
-//        guard let gestureView = gesture.view else {
-//            return
-//        }
-//
-//        gestureView.transform = gestureView.transform.scaledBy(
-//            x: gesture.scale,
-//            y: gesture.scale
-//        )
-//        gesture.scale = 1
     }
 
     @objc
     func handleRotate(_ gesture:UIRotationGestureRecognizer) {
-//        guard let gestureView = gesture.view else {
-//            return
-//        }
-//
-//        gestureView.transform = gestureView.transform.rotated(by: gesture.rotation)
-//        gesture.rotation = 0
-////        var original = CGFloat()
-////        var last: CGFloat = 0
-////
-////        if gesture.state == .began {
-////            gesture.rotation = last
-////            original = gesture.rotation
-////        } else if gesture.state == .changed {
-////            let new = gesture.rotation + original
-////            gesture.view?.transform = CGAffineTransform(rotationAngle: new)
-////        } else if gesture.state == .ended {
-////            last = gesture.rotation
-////        }
+        guard let shapeView = gesture.view as? ShapeView else {
+            return
+        }
+        
+        switch gesture.state {
+        case .possible:
+            print("possible")
+        case .began:
+            gravity.removeItem(shapeView)
+        case .changed:
+            collision.removeItem(shapeView)
+            elasticity.removeItem(shapeView)
+            shapeView.transform = shapeView.transform.rotated(
+                by: gesture.rotation
+            )
+            gesture.rotation = 0
+            collision.addItem(shapeView)
+            elasticity.addItem(shapeView)
+            animator.updateItem(usingCurrentState: shapeView)
+        case .ended:
+            gravity.addItem(shapeView)
+        case .cancelled:
+            gravity.addItem(shapeView)
+        case .failed:
+            gravity.addItem(shapeView)
+        @unknown default:
+            break
+        }
+        /*
+        guard let gestureView = gesture.view else {
+            return
+        }
+
+        gestureView.transform = gestureView.transform.rotated(by: gesture.rotation)
+        gesture.rotation = 0
+        var original = CGFloat()
+        var last: CGFloat = 0
+
+        if gesture.state == .began {
+            gesture.rotation = last
+            original = gesture.rotation
+        } else if gesture.state == .changed {
+            let new = gesture.rotation + original
+            gesture.view?.transform = CGAffineTransform(rotationAngle: new)
+        } else if gesture.state == .ended {
+            last = gesture.rotation
+        }
+         */
     }
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
