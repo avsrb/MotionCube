@@ -11,38 +11,13 @@ import CoreMotion
 final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICollisionBehaviorDelegate {
 
     private lazy var initialSize = CGSize(width: 100, height: 100)
-        
-//    private lazy var tapGesture: UITapGestureRecognizer = {
-//        let tapGesture = UITapGestureRecognizer()
-//        tapGesture.addTarget(self, action: #selector(handleTap))
-//        return tapGesture
-//    }()
-//
-//    private lazy var panGesture: UIPanGestureRecognizer = {
-//        let panGesture = UIPanGestureRecognizer()
-//        panGesture.addTarget(self, action: #selector(handlePan))
-//        return panGesture
-//    }()
-//
-//    private lazy var pinchGesture: UIPinchGestureRecognizer = {
-//        let pinchGesture = UIPinchGestureRecognizer()
-//        pinchGesture.addTarget(self, action: #selector(handlePitch))
-//        return pinchGesture
-//    }()
-//
-//    private lazy var rotateGesture: UIRotationGestureRecognizer = {
-//        let rotationGesture = UIRotationGestureRecognizer()
-//        rotationGesture.addTarget(self, action: #selector(handleRotate))
-//        return rotationGesture
-//    }()
-    
     private lazy var animator = UIDynamicAnimator(referenceView: view)
-    
     private lazy var gravity = UIGravityBehavior(items: [])
     private lazy var collision = UICollisionBehavior(items: [])
     private lazy var elasticity = UIDynamicItemBehavior(items: [])
-    private lazy var motion = CMMotionManager()
-    
+    private lazy var motionManager = CMMotionManager()
+    private lazy var motionQueue = OperationQueue()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .orange
@@ -55,11 +30,7 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
         animator.addBehavior(gravity)
         animator.addBehavior(collision)
         animator.addBehavior(elasticity)
-        // почитать про это
-//        motion.startAccelerometerUpdates(to: .main) { <#CMAccelerometerData?#>, <#Error?#> in
-//            <#code#>
-//        }
-
+        activateAccelerometer()
     }
 
     @objc
@@ -120,6 +91,7 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
     @objc
     private func handlePitch(_ gesture: UIPinchGestureRecognizer) {
         guard let shapeView = gesture.view as? ShapeView, let superview = shapeView.superview else { return }
+        
         switch gesture.state {
         case .began:
             self.gravity.removeItem(shapeView)
@@ -140,41 +112,6 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
         default:
             break
         }
-        
-        
-        
-//        guard let shapeView = gesture.view as? ShapeView else {
-//            return
-//        }
-//
-//        switch gesture.state {
-//        case .possible:
-//            break
-//        case .began:
-//            gravity.removeItem(shapeView)
-//        case .changed:
-//            collision.removeItem(shapeView)
-//            elasticity.removeItem(shapeView)
-////            shapeView.transform = shapeView.transform.scaledBy(
-////                x: gesture.scale,
-////                y: gesture.scale
-////            )
-////            gesture.scale = 1.0
-//            let newWidth = shapeView.layer.bounds.size.width * gesture.scale
-//            let newHeigh = shapeView.layer.bounds.size.height * gesture.scale
-//            if newWidth < view.bounds.width - 50 && newHeigh < view.bounds.height - 50 && newWidth > 10 && newHeigh > 10 {
-//                shapeView.layer.bounds.size.width = newWidth
-//                shapeView.layer.bounds.size.height = newHeigh
-//                gesture.scale = 1
-//            }
-//            collision.addItem(shapeView)
-//            elasticity.addItem(shapeView)
-//            animator.updateItem(usingCurrentState: shapeView)
-//        case .ended, .cancelled, .failed:
-//            gravity.addItem(shapeView)
-//        @unknown default:
-//            break
-//        }
     }
 
     @objc
@@ -204,4 +141,15 @@ final class ViewController: UIViewController, UIGestureRecognizerDelegate, UICol
             break
         }
     }
+    
+    private func activateAccelerometer() {
+        motionManager.startDeviceMotionUpdates(to: motionQueue) { deviceMotion, _ in
+            guard let motion = deviceMotion else { return }
+            let gravity = motion.gravity
+            DispatchQueue.main.async {
+                self.gravity.gravityDirection = CGVector(dx: -gravity.y * 5, dy: -gravity.x * 5)
+            }
+        }
+    }
+
 }
