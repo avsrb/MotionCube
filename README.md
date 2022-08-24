@@ -5,4 +5,6 @@ Learned:
  - CoreMotion for the device orientation in an application that makes you toy with squares and circles. These shapes will be subject to physical laws such as gravity, elasticity and collisions using a UIDynamicAnimator.
 
 Waiting...
-![](demo.gif)
+
+<img src="demo.gif" width="800" height="600" />
+
